@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "data_version": "demo-2026-11",
+  "records": [
+    {"observation_id": "obs-park-p1", "boundary": "park", "period": "2026-10", "electricity": 100},
+    {"observation_id": "obs-wa-p1", "boundary": "workshop-a", "period": "2026-10", "electricity": 40, "output": 2},
+    {"observation_id": "obs-wb-p1", "boundary": "workshop-b", "period": "2026-10", "electricity": 60, "output": 30},
+    {"observation_id": "obs-park-p2", "boundary": "park", "period": "2026-11", "electricity": 100},
+    {"observation_id": "obs-wa-p2", "boundary": "workshop-a", "period": "2026-11", "electricity": 40, "output": 2}
+  ],
+  "coverage": [
+    {"parent": "park", "children": ["workshop-a", "workshop-b"]}
+  ],
+  "units": {
+    "electricity": "kWh",
+    "output": "t"
+  },
+  "measures": {
+    "electricity": {"unit": "kWh", "kind": "flow"},
+    "output": {"unit": "t", "kind": "flow"}
+  },
+  "factors": [
+    {
+      "factor_id": "grid-v2026.10",
+      "activity": "electricity",
+      "region": "default",
+      "unit": "kgCO2e/kWh",
+      "value": 0.5,
+      "priority": 0,
+      "version": "v2026.10",
+      "valid_from": "2026-01",
+      "valid_to": "2026-12"
+    },
+    {
+      "factor_id": "grid-v2026.11",
+      "activity": "electricity",
+      "region": "default",
+      "unit": "kgCO2e/kWh",
+      "value": 0.6,
+      "priority": 0,
+      "version": "v2026.11",
+      "valid_from": "2026-01",
+      "valid_to": "2026-12"
+    }
+  ],
+  "definitions": [
+    {
+      "name": "park_electricity",
+      "expression": "sum(measure(\"electricity\"), over=[\"boundary\"])"
+    },
+    {
+      "name": "park_emission",
+      "expression": "sum(apply_factor(measure(\"electricity\"), activity=\"electricity\"), over=[\"boundary\"])"
+    },
+    {
+      "name": "park_output",
+      "expression": "sum(measure(\"output\"), over=[\"boundary\"])"
+    },
+    {
+      "name": "park_intensity",
+      "expression": "park_emission / park_output"
+    },
+    {
+      "name": "intensity_delta",
+      "expression": "under(park_emission, \"new_factor\") / park_output - park_intensity"
+    }
+  ]
+}
